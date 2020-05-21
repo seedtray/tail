@@ -17,8 +17,9 @@ func TestTail(t *testing.T) {
 	afero.WriteFile(defaultFS, "/foo/2", []byte{4, 10, 5}, 644)
 	afero.WriteFile(defaultFS, "/foo/3", []byte{6, 10, 7}, 644)
 
-	b1, err := reader.tail(context.Background(), "/foo", nil)
+	out1, err := reader.tail(context.Background(), "/foo", nil)
 	g.Expect(err).ToNot(HaveOccurred())
+	var b1 *RecordBatch = <-out1
 	g.Expect(b1).To(Equal(&RecordBatch{
 		id: RecordID{
 			filename: "2",
@@ -32,8 +33,9 @@ func TestTail(t *testing.T) {
 		},
 	}))
 
-	b2, err := reader.tail(context.Background(), "/foo", &b1.id)
+	out2, err := reader.tail(context.Background(), "/foo", &b1.id)
 	g.Expect(err).ToNot(HaveOccurred())
+	var b2 *RecordBatch = <-out2
 	g.Expect(b2).To(Equal(&RecordBatch{
 		id: RecordID{
 			filename: "3",
@@ -45,5 +47,4 @@ func TestTail(t *testing.T) {
 			{7},
 		},
 	}))
-
 }
